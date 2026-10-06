@@ -59,8 +59,14 @@
   li strong { display: block; margin-bottom: 2px; }
   li p { margin: 0; color: var(--muted); }
   .cmd { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+  html, body { overflow-x: hidden; max-width: 100%; }
+  main, .guide, .list, .search, ol, li { min-width: 0; max-width: 100%; }
+  .cmd { min-width: 0; }
+  .cmd button.copy { flex-shrink: 0; }
+  .item span { min-width: 0; overflow-wrap: anywhere; }
+  .item small { margin-left: 12px; overflow-wrap: anywhere; text-align: right; }
   code {
-    flex: 1; padding: 10px 12px; overflow-x: auto; white-space: nowrap; font: 14px ui-monospace, Menlo, Consolas, monospace;
+    flex: 1 1 0; min-width: 0; max-width: 100%; padding: 10px 12px; overflow-x: auto; white-space: nowrap; font: 14px ui-monospace, Menlo, Consolas, monospace;
     background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
   }
   button.copy, a.btn {
