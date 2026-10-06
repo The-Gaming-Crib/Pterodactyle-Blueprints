@@ -1,0 +1,21 @@
+name: Bug report
+description: Something in a blueprint isn't working
+labels: ["bug"]
+body:
+  - type: input
+    id: blueprint
+    attributes:
+      label: Which blueprint?
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What went wrong?
+      description: Include any error messages.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Panel and Blueprint versions
