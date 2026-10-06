@@ -92,8 +92,18 @@
 
 <script>
 // ---- EDIT THESE TWO LINES ----
-const OWNER = "YOUR-GITHUB-USERNAME";
-const REPO  = "YOUR-REPO-NAME";
+// On github.io these are detected automatically from the address bar.
+// Only fill these in if you use a custom domain or open the file locally.
+let OWNER = "";
+let REPO  = "";
+(function () {
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    OWNER = host.split(".")[0];
+    const first = location.pathname.split("/").filter(Boolean)[0];
+    REPO = first || host; // user site: repo is named username.github.io
+  }
+})();
 // Folder in the repo that holds the .blueprint files
 const FOLDER = "blueprints";
 // Panel location on your server (change if yours is different)
