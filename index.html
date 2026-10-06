@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Pterodactyl Blueprints</title>
+<style>
+  :root {
+    --bg: #12151f; --surface: #1b2030; --line: #2c3350;
+    --text: #e8eaf4; --muted: #9aa3c0; --accent: #7aa2ff; --accent-ink: #0d1530;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f3f5fb; --surface: #ffffff; --line: #d6dbec;
+      --text: #161a2e; --muted: #5b6482; --accent: #2f57d8; --accent-ink: #ffffff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    min-height: 100%; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 20px; gap: 20px;
+  }
+  main.has-results { justify-content: flex-start; padding-top: 14vh; }
+  h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; text-align: center; }
+  .sub { margin: 0; color: var(--muted); text-align: center; max-width: 46ch; }
+  .search { width: min(560px, 100%); }
+  input[type=search] {
+    width: 100%; padding: 16px 20px; font: inherit; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; outline: none;
+  }
+  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .list { width: min(560px, 100%); display: grid; gap: 8px; }
+  .item {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    padding: 14px 18px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .item:hover, .item:focus-visible { border-color: var(--accent); outline: none; }
+  .item small { color: var(--muted); }
+  .status { color: var(--muted); text-align: center; }
+  .guide { width: min(640px, 100%); }
+  .back { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 0; margin-bottom: 16px; }
+  .guide h2 { margin: 0 0 4px; font-size: 28px; letter-spacing: -0.01em; }
+  ol { margin: 24px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+  li {
+    counter-increment: s; position: relative; padding: 16px 18px 16px 58px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  li::before {
+    content: counter(s); position: absolute; left: 16px; top: 16px; width: 28px; height: 28px;
+    display: grid; place-items: center; border-radius: 50%; font-weight: 600; font-size: 14px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  li strong { display: block; margin-bottom: 2px; }
+  li p { margin: 0; color: var(--muted); }
+  .cmd { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+  code {
+    flex: 1; padding: 10px 12px; overflow-x: auto; white-space: nowrap; font: 14px ui-monospace, Menlo, Consolas, monospace;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  }
+  button.copy, a.btn {
+    padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; text-decoration: none; color: var(--accent-ink);
+    background: var(--accent); border: 0; border-radius: 8px;
+  }
+  a.btn { display: inline-block; margin-top: 10px; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main id="main">
+  <section id="home" style="display:contents">
+    <h1>Free Pterodactyl Blueprints</h1>
+    <p class="sub">Search for an extension, click it, and follow the setup steps.</p>
+    <div class="search"><input id="q" type="search" placeholder="Search blueprints" aria-label="Search blueprints" autocomplete="off" autofocus></div>
+    <div id="status" class="status">Loading blueprints...</div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <section id="guide" class="guide" hidden>
+    <button class="back" id="back">Back to search</button>
+    <h2 id="gname"></h2>
+    <div class="sub" style="text-align:left">Follow these steps on the server that runs your panel.</div>
+    <ol id="steps"></ol>
+  </section>
+</main>
+
+<script>
+// ---- EDIT THESE TWO LINES ----
+const OWNER = "YOUR-GITHUB-USERNAME";
+const REPO  = "YOUR-REPO-NAME";
+// Folder in the repo that holds the .blueprint files
+const FOLDER = "blueprints";
+// Panel location on your server (change if yours is different)
+const PANEL_DIR = "/var/www/pterodactyl";
+// Used only if the GitHub lookup fails: [{ name: "example", url: "https://..." }]
+const FALLBACK = [];
+// ------------------------------
+
+const $ = id => document.getElementById(id);
+let blueprints = [];
+
+function pretty(file) { return file.replace(/\.blueprint$/i, ""); }
+
+async function load() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`);
+    if (!res.ok) throw new Error(res.status);
+    const files = await res.json();
+    blueprints = files
+      .filter(f => f.type === "file" && /\.blueprint$/i.test(f.name))
+      .map(f => ({ id: pretty(f.name), file: f.name, url: f.download_url }));
+  } catch (e) {
+    blueprints = FALLBACK.map(b => ({ id: b.name, file: b.name + ".blueprint", url: b.url }));
+  }
+  blueprints.sort((a, b) => a.id.localeCompare(b.id));
+  render();
+}
+
+function render() {
+  const term = $("q").value.trim().toLowerCase();
+  const hits = blueprints.filter(b => b.id.toLowerCase().includes(term));
+  const list = $("list");
+  list.innerHTML = "";
+  $("main").classList.toggle("has-results", hits.length > 0 && blueprints.length > 0);
+  if (!blueprints.length) {
+    $("status").textContent = "Could not load the blueprint list. Check the OWNER and REPO values at the top of this file.";
+    return;
+  }
+  $("status").textContent = hits.length ? "" : "No blueprints match that search.";
+  hits.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "item";
+    btn.innerHTML = `<span></span><small>${b.file}</small>`;
+    btn.firstChild.textContent = b.id;
+    btn.onclick = () => openGuide(b);
+    list.appendChild(btn);
+  });
+}
+
+function cmdBlock(text) {
+  return `<div class="cmd"><code>${text}</code><button class="copy" data-copy="${text.replace(/"/g, "&quot;")}">Copy</button></div>`;
+}
+
+function openGuide(b) {
+  $("gname").textContent = b.id;
+  const steps = [
+    ["Back up your panel", "Make a backup of your panel files and database before installing any extension."],
+    ["Check the file is safe", "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code."],
+    ["Go to your panel folder", "Connect to your server over SSH and open the Pterodactyl directory." + cmdBlock(`cd ${PANEL_DIR}`)],
+    ["Download the blueprint", "Download it straight onto the server, or download it here and upload it to the panel folder yourself." +
+      cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+    ["Install it", "Run the Blueprint installer with the extension name." + cmdBlock(`blueprint -install ${b.id}`)],
+    ["Check it worked", "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed. If something looks wrong, run the install command again and read any error it prints."]
+  ];
+  $("steps").innerHTML = steps.map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
+  $("home").hidden = true;
+  $("guide").hidden = false;
+  $("main").classList.remove("has-results");
+  window.scrollTo(0, 0);
+}
+
+$("back").onclick = () => {
+  $("guide").hidden = true;
+  $("home").hidden = false;
+  render();
+};
+$("q").addEventListener("input", render);
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-copy]");
+  if (!t) return;
+  navigator.clipboard.writeText(t.dataset.copy).then(() => {
+    t.textContent = "Copied";
+    setTimeout(() => t.textContent = "Copy", 1500);
+  });
+});
+
+load();
+</script>
+</body>
+</html>
