@@ -1,0 +1,17 @@
+name: Suggestion
+description: An idea to improve a blueprint or this site
+labels: ["enhancement"]
+body:
+  - type: input
+    id: blueprint
+    attributes:
+      label: Which blueprint?
+      description: Write the blueprint name, or "Website" if it's about this site.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What's your idea?
+    validations:
+      required: true
