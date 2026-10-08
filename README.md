@@ -31,7 +31,11 @@ A `.blueprint` file is just a zipped archive of code, so you can also unzip it a
 - Always back up your panel before installing any extension.
 - Bugs and requests are welcome. Open an issue and I'll see what I can do.
  
-## License
+## 📜 License & Terms
 
-Free to use, modify, and share, including by hosting providers. You may not
-sell them, even modified. See [LICENSE](./LICENSE) for details.
+This blueprint is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+- ✅ **Free Use:** Anyone can download, use, host, and modify this blueprint for free.
+- ✅ **Game Hosts:** Hosting providers are welcome to run this blueprint on their panels for their users without paying extra.
+- ❌ **No Resale:** You may not sell this blueprint file, charge for downloads, lock it behind paywalls, or sell modified versions/addons on marketplaces (e.g., BuiltByBit, SourceXchange).
+
