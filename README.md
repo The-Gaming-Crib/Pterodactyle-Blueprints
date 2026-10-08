@@ -30,7 +30,8 @@ A `.blueprint` file is just a zipped archive of code, so you can also unzip it a
 - These are made for personal use first, so they may have rough edges.
 - Always back up your panel before installing any extension.
 - Bugs and requests are welcome. Open an issue and I'll see what I can do.
-
+ 
 ## License
 
-Free to use, modify, and share. Please do not resell them.
+Free to use, modify, and share, including by hosting providers. You may not
+sell them, even modified. See [LICENSE](./LICENSE) for details.
